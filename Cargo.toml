@@ -1,0 +1,17 @@
+[package]
+name = "yuv"
+version = "0.1.0"
+authors = ["Kornel Lesiński <kornel@geekhood.net>"]
+categories = ["multimedia::encoding"]
+description = "Conversion between various YUV (YCbCr) formats and RGB"
+edition = "2018"
+homepage = "https://lib.rs/crates/yuv"
+include = ["/Cargo.toml", "/README.md", "/src/*.rs", "LICENSE"]
+keywords = ["ycbcr", "rec709", "bt601", "color", "rgb"]
+license = "BSD-2-Clause"
+readme = "README.md"
+repository = "https://github.com/kornelski/yuv.git"
+
+[dependencies]
+num-traits = "0.2.12"
+rgb = "0.8.25"
