@@ -10,7 +10,10 @@ use rgb::RGB;
 
 /// Trait for YUV -> RGB conversion implemented by color-space-specific converters. See [`RGBConvert`]
 pub trait ToRGB<F = u8, T = u8> {
+    /// Convert YUV (YCbCr, etc.) to RGB
     fn to_rgb(&self, px: YUV<F>) -> RGB<T>;
+    /// Ignore UV channels, and just convert Y
+    fn to_luma(&self, y: F) -> T;
 }
 
 /// Enum containing concrete type of converter used.
@@ -97,6 +100,11 @@ impl<T> ToRGB<T, T> for Copy<T> {
     fn to_rgb(&self, px: YUV<T>) -> RGB<T> {
         RGB::new(px.y, px.u, px.v)
     }
+
+    #[inline(always)]
+    fn to_luma(&self, y: T) -> T {
+        y
+    }
 }
 
 /// Rescaling bit range for YUV -> GBR
@@ -157,6 +165,11 @@ impl ToRGB<u8, u8> for IdentityScale<u8> {
             r: rescale8(px.v, self.min, self.range),
         }
     }
+
+    #[inline(always)]
+    fn to_luma(&self, y: u8) -> u8 {
+        rescale8(y, self.min, self.range)
+    }
 }
 
 impl ToRGB<u16, u16> for IdentityScale<u16> {
@@ -167,6 +180,11 @@ impl ToRGB<u16, u16> for IdentityScale<u16> {
             b: rescale16(px.u, self.min, self.range),
             r: rescale16(px.v, self.min, self.range),
         }
+    }
+
+    #[inline(always)]
+    fn to_luma(&self, y: u16) -> u16 {
+        rescale16(y, self.min, self.range)
     }
 }
 
@@ -231,6 +249,11 @@ impl<T> ToRGB<T, u8> for Matrix<T> where T: Into<f32> {
         })
         .map(|c| c.min(255.) as u8)
     }
+
+    #[inline]
+    fn to_luma(&self, y: T) -> u8 {
+        (y.into() * self.y_scale.mul - self.y_scale.sub) as u8
+    }
 }
 
 impl Matrix<u16> {
@@ -258,7 +281,12 @@ impl<T> ToRGB<T, u16> for Matrix<T> where T: Into<f32> {
             u: px.u.into(),
             v: px.v.into(),
         })
-        .map(|c| c.min(65535.) as u16)
+        .map(|c| c as u16)
+    }
+
+    #[inline]
+    fn to_luma(&self, y: T) -> u16 {
+        (y.into() * self.y_scale.mul - self.y_scale.sub) as u16
     }
 }
 
@@ -276,14 +304,21 @@ fn matrix_conv() {
     let m = Matrix::<u8>::new(0.2126, 0.0722, Range::Full);
     let px = m.to_rgbf(YUV{y:222.,u:128.,v:128.}).map(|c| c.floor() as u8);
     assert_eq!(RGB::new(222,222,222), px);
+    assert_eq!(222u8, m.to_luma(222u8));
+    assert_eq!(0u8, m.to_luma(0u8));
+    assert_eq!(255u8, m.to_luma(255u8));
 
-    let m = Matrix::<u8>::new(0.2126, 0.0722, Range::Full);
     let px = m.to_rgbf(YUV{y:128.,u:40.,v:160.}).map(|c| c.floor() as u8);
     assert_eq!(RGB::new(179,130,0), px);
 
     let m = Matrix::<u8>::new(0.2126, 0.0722, Range::Limited);
     let px = m.to_rgbf(YUV{y:128.,u:115.,v:90.}).map(|c| c.floor() as u8);
     assert_eq!(RGB::new((16007u16/256) as u8, (39433u16/256) as u8, (26458u16/256) as u8), px);
+    assert_eq!(0u8, m.to_luma(16u8));
+    assert_eq!(2u8, m.to_luma(18u8));
+    assert_eq!(0u8, m.to_luma(0u8));
+    assert_eq!(255u8, m.to_luma(240u8));
+    assert_eq!(255u8, m.to_luma(255u8));
 
     let m = Matrix::<u16>::new(0.2126, 0.0722, Range::Limited, Depth::Depth10);
     let px = m.to_rgbf(YUV{y:4.*128.,u:4.*115.,v:4.*90.}).map(|c| c.floor() as u16);
@@ -292,4 +327,6 @@ fn matrix_conv() {
     let m = Matrix::<u16>::new(0.2126, 0.0722, Range::Limited, Depth::Depth12);
     let px = m.to_rgbf(YUV{y:16.*128.,u:16.*115.,v:16.*90.}).map(|c| c.floor() as u16);
     assert_eq!(RGB::new(16007, 39433, 26458), px);
+    assert_eq!(0u16, m.to_luma(0u16));
+    assert_eq!(5592u16, m.to_luma(555u16));
 }
