@@ -89,6 +89,33 @@ impl<T> RGBConvert<T> where Matrix<T>: ToRGB<T, T>, IdentityScale<T>: ToRGB<T, T
             Self::IdentityScale(c) => c.to_rgb(px),
         }
     }
+
+    /// Convert a single Y (Luma) value to a grayscale value.
+    #[inline(always)]
+    pub fn to_luma(&self, px: T) -> T {
+        match self {
+            Self::Matrix(c) => c.to_luma(px),
+            Self::Copy(c) => c.to_luma(px),
+            Self::IdentityScale(c) => c.to_luma(px),
+        }
+    }
+}
+
+impl<T> ToRGB<T,T> for RGBConvert<T> where Matrix<T>: ToRGB<T, T>, IdentityScale<T>: ToRGB<T, T> {
+    /// Convert a single YUV pixel to an RGB pixel.
+    ///
+    /// This method has a `match` internally, which may or may not be the fastest way to do this (dependin on optimizer).
+    /// If you want to have optimal code, use variants of this `enum` individually. They all implement `ToRGB` trait.
+    #[inline(always)]
+    fn to_rgb(&self, px: YUV<T>) -> RGB<T> {
+        RGBConvert::to_rgb(self, px)
+    }
+
+    /// Convert a single Y (Luma) value to a grayscale value.
+    #[inline(always)]
+    fn to_luma(&self, y: T) -> T {
+        RGBConvert::to_luma(self, y)
+    }
 }
 
 /// Fast path when no conversion needed for YUV -> GBR

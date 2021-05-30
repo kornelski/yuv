@@ -1,6 +1,6 @@
 [package]
 name = "yuv"
-version = "0.1.2"
+version = "0.1.4"
 authors = ["Kornel Lesiński <kornel@geekhood.net>"]
 categories = ["multimedia::encoding"]
 description = "Conversion between various YUV (YCbCr) formats and RGB"
