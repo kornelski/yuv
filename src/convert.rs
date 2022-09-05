@@ -27,7 +27,7 @@ pub enum RGBConvert<T = u8> {
     /// Converter YCbCr color spaces
     Matrix(Matrix<T>),
     /// No conversion
-    Copy(Copy<T>),
+    Copy(CopyGBR<T>),
     /// Scale numbers from 10/12-bit to 16-bit, and/or from studio range to full range. All channels use Y range.
     IdentityScale(IdentityScale<T>),
 }
@@ -52,7 +52,7 @@ impl RGBConvert<u8> {
         }
         if matrix == MatrixCoefficients::Identity {
             return Ok(match range {
-                Range::Full => Self::Copy(Copy(PhantomData)),
+                Range::Full => Self::Copy(CopyGBR(PhantomData)),
                 Range::Limited => Self::IdentityScale(IdentityScale::<u8>::new()),
             });
         }
@@ -68,7 +68,7 @@ impl RGBConvert<u16> {
         }
         if matrix == MatrixCoefficients::Identity {
             return Ok(match (range, depth) {
-                (Range::Full, Depth::Depth16) => Self::Copy(Copy(PhantomData)),
+                (Range::Full, Depth::Depth16) => Self::Copy(CopyGBR(PhantomData)),
                 _ => Self::IdentityScale(IdentityScale::<u16>::new(range, depth)?),
             });
         }
@@ -120,12 +120,12 @@ impl<T> ToRGB<T,T> for RGBConvert<T> where Matrix<T>: ToRGB<T, T>, IdentityScale
 
 /// Fast path when no conversion needed for YUV -> GBR
 #[derive(Debug, Copy, Clone)]
-pub struct Copy<T = u8>(PhantomData<T>);
+pub struct CopyGBR<T = u8>(PhantomData<T>);
 
-impl<T> ToRGB<T, T> for Copy<T> {
+impl<T> ToRGB<T, T> for CopyGBR<T> {
     #[inline(always)]
     fn to_rgb(&self, px: YUV<T>) -> RGB<T> {
-        RGB::new(px.y, px.u, px.v)
+        RGB::new(px.v, px.y, px.u)
     }
 
     #[inline(always)]
