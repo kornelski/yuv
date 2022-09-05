@@ -1,10 +1,10 @@
 [package]
 name = "yuv"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Kornel Lesiński <kornel@geekhood.net>"]
 categories = ["multimedia::encoding"]
 description = "Conversion between various YUV (YCbCr) formats and RGB"
-edition = "2018"
+edition = "2021"
 homepage = "https://lib.rs/crates/yuv"
 include = ["/Cargo.toml", "/README.md", "/src/*.rs", "LICENSE"]
 keywords = ["ycbcr", "rec709", "bt601", "color", "rgb"]

@@ -21,7 +21,7 @@ pub trait CheckedAs {
 impl CheckedAs for i8 {
     #[inline(always)]
     fn as_i8(self) -> i8 {
-        self.into()
+        self
     }
     #[cfg(debug_assertions)]
     #[inline(always)]
@@ -81,7 +81,7 @@ impl CheckedAs for u8 {
     }
     #[inline(always)]
     fn as_u8(self) -> u8 {
-        self.into()
+        self
     }
     #[inline(always)]
     fn as_u16(self) -> u16 {
@@ -129,7 +129,7 @@ impl CheckedAs for u16 {
     }
     #[inline(always)]
     fn as_u16(self) -> u16 {
-        self.into()
+        self
     }
     #[cfg(debug_assertions)]
     #[inline(always)]
@@ -191,7 +191,7 @@ impl CheckedAs for i16 {
     }
     #[inline(always)]
     fn as_i16(self) -> i16 {
-        self.into()
+        self
     }
     #[inline(always)]
     fn as_i32(self) -> i32 {
@@ -267,7 +267,7 @@ impl CheckedAs for u32 {
     }
     #[inline(always)]
     fn as_u32(self) -> u32 {
-        self.into()
+        self
     }
     #[inline(always)]
     fn as_i64(self) -> i64 {
@@ -320,7 +320,7 @@ impl CheckedAs for i32 {
     }
     #[inline(always)]
     fn as_i32(self) -> i32 {
-        self.into()
+        self
     }
     #[cfg(debug_assertions)]
     #[inline(always)]
@@ -402,6 +402,6 @@ impl CheckedAs for i64 {
     }
     #[inline(always)]
     fn as_i64(self) -> i64 {
-        self.into()
+        self
     }
 }
