@@ -1,6 +1,6 @@
 //! YUV -> RGB converter. See [`RGBConvert::new`]
 use crate::Error;
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 use crate::color::*;
 use crate::depth;
 use crate::range;

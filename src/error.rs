@@ -1,4 +1,9 @@
-use std::fmt;
+use core::fmt;
+
+#[cfg(not(feature = "no_std"))]
+use std::error;
+#[cfg(feature = "no_std")]
+use core::error;
 
 /// This library doesn't support all combinations of color spaces
 #[derive(Debug, Copy, Clone)]
@@ -8,9 +13,9 @@ pub enum Error {
     InvalidDepthRequested,
 }
 
-impl std::error::Error for Error {}
+impl error::Error for Error {}
 
-impl std::fmt::Display for Error {
+impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.write_str(match self {
             Self::UnsupportedTransferCharacteristics => "Unsupported color space (transfer characteristics)",

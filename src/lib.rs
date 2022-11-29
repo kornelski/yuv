@@ -3,6 +3,8 @@
 //! 1. [`color`] `enum`s that can be used to describe color spaces in image and video formats, as defined in ISO/IEC 23091-4/ITU-T H.273
 //! 2. Routines to [`convert`] between YUV family of color spaces and RGB.
 
+#![cfg_attr(feature="no_std", no_std, feature(error_in_core))]
+
 /// Enums describing color characteristics (color space, gamma, range)
 ///
 /// The numbers should be compatible with ISO/IEC 23091-4/ITU-T H.273

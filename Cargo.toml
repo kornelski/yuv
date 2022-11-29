@@ -15,3 +15,7 @@ repository = "https://github.com/kornelski/yuv.git"
 [dependencies]
 num-traits = "0.2.14"
 rgb = "0.8.27"
+
+
+[features]
+no_std = []
