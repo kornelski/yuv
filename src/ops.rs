@@ -1,5 +1,5 @@
 #[cfg(debug_assertions)]
-use std::convert::TryInto;
+use core::convert::TryInto;
 
 pub trait CheckedAs {
     #[cfg_attr(debug_assertions, track_caller)]
