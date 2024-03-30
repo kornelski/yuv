@@ -1,5 +1,5 @@
 /// Chroma subsampling format
-#[derive(Debug, Copy, Clone, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum ChromaSampling {
     /// 4:2:0 = 2x2 pixels of luma per 1 pixel of chroma
     Cs420,
@@ -90,7 +90,7 @@ pub enum TransferCharacteristics {
 
 /// Bit depth (8 = 1 byte, >=10 = 2 bytes)
 #[repr(C)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, PartialOrd, Ord)]
 pub enum Depth {
     Depth8 = 8,
     Depth10 = 10,
