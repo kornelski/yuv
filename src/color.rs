@@ -1,4 +1,3 @@
-
 /// Chroma subsampling format
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum ChromaSampling {
@@ -50,7 +49,6 @@ pub enum ColorPrimaries {
     EBU3213 = 22,
 }
 
-
 /// Gamma correction, essentially.
 /// As defined by “Transfer characteristics” section of ISO/IEC 23091-4/ITU-TH.273.
 #[repr(C)]
@@ -92,7 +90,7 @@ pub enum TransferCharacteristics {
 
 /// Bit depth (8 = 1 byte, >=10 = 2 bytes)
 #[repr(C)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, PartialOrd, Ord)]
 pub enum Depth {
     Depth8 = 8,
     Depth10 = 10,
