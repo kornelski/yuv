@@ -1,6 +1,5 @@
-
 /// Chroma subsampling format
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, PartialOrd, Ord)]
 pub enum ChromaSampling {
     /// 4:2:0 = 2x2 pixels of luma per 1 pixel of chroma
     Cs420,
@@ -49,7 +48,6 @@ pub enum ColorPrimaries {
     /// EBU Tech. 3213-E
     EBU3213 = 22,
 }
-
 
 /// Gamma correction, essentially.
 /// As defined by “Transfer characteristics” section of ISO/IEC 23091-4/ITU-TH.273.
