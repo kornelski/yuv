@@ -76,7 +76,7 @@ impl RGBConvert<u16> {
     }
 }
 
-impl<T> RGBConvert<T> where Matrix<T>: ToRGB<T, T>, IdentityScale<T>: ToRGB<T, T> {
+impl<T: Copy> RGBConvert<T> where Matrix<T>: ToRGB<T, T>, IdentityScale<T>: ToRGB<T, T> {
     /// Convert a single YUV pixel to an RGB pixel.
     ///
     /// This method has a `match` internally, which may or may not be the fastest way to do this (dependin on optimizer).
@@ -101,7 +101,7 @@ impl<T> RGBConvert<T> where Matrix<T>: ToRGB<T, T>, IdentityScale<T>: ToRGB<T, T
     }
 }
 
-impl<T> ToRGB<T,T> for RGBConvert<T> where Matrix<T>: ToRGB<T, T>, IdentityScale<T>: ToRGB<T, T> {
+impl<T: Copy> ToRGB<T,T> for RGBConvert<T> where Matrix<T>: ToRGB<T, T>, IdentityScale<T>: ToRGB<T, T> {
     /// Convert a single YUV pixel to an RGB pixel.
     ///
     /// This method has a `match` internally, which may or may not be the fastest way to do this (dependin on optimizer).
@@ -122,7 +122,7 @@ impl<T> ToRGB<T,T> for RGBConvert<T> where Matrix<T>: ToRGB<T, T>, IdentityScale
 #[derive(Debug, Copy, Clone)]
 pub struct CopyGBR<T = u8>(PhantomData<T>);
 
-impl<T> ToRGB<T, T> for CopyGBR<T> {
+impl<T: Copy> ToRGB<T, T> for CopyGBR<T> {
     #[inline(always)]
     fn to_rgb(&self, px: YUV<T>) -> RGB<T> {
         RGB::new(px.v, px.y, px.u)
@@ -215,7 +215,7 @@ impl ToRGB<u16, u16> for IdentityScale<u16> {
     }
 }
 
-/// Converter for YCbCr color spaces
+/// Converter for `YCbCr` color spaces
 #[derive(Debug, Copy, Clone)]
 pub struct Matrix<T = u8> {
     y_scale: range::RangeScale,
@@ -226,7 +226,7 @@ pub struct Matrix<T = u8> {
     a: f32, b: f32, c: f32, d: f32,
 }
 
-impl<T> Matrix<T> {
+impl<T: Copy> Matrix<T> {
     fn new_internal(kr: f64, kb: f64, y_scale: range::RangeScale, uv_scale: range::RangeScale) -> Self {
         let kg = 1. - kr - kb;
         assert!(kr > 0. && kg > 0. && kb > 0.);
@@ -266,7 +266,7 @@ impl Matrix<u8> {
     }
 }
 
-impl<T> ToRGB<T, u8> for Matrix<T> where T: Into<f32> {
+impl<T: Copy> ToRGB<T, u8> for Matrix<T> where T: Into<f32> {
     #[inline]
     fn to_rgb(&self, px: YUV<T>) -> RGB<u8> {
         self.to_rgbf(YUV {
@@ -300,7 +300,7 @@ impl Matrix<u16> {
     }
 }
 
-impl<T> ToRGB<T, u16> for Matrix<T> where T: Into<f32> {
+impl<T: Copy> ToRGB<T, u16> for Matrix<T> where T: Into<f32> {
     #[inline]
     fn to_rgb(&self, px: YUV<T>) -> RGB<u16> {
         self.to_rgbf(YUV {
