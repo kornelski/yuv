@@ -1,4 +1,4 @@
-use crate::depth::*;
+use crate::depth::{Bounded, Depth, Depth10, Depth12, Depth16, Depth8};
 use crate::ops::CheckedAs;
 use num_traits::PrimInt;
 
@@ -99,14 +99,14 @@ pub(crate) trait ToFloat {
 impl ToFloat for u8 {
     #[inline(always)]
     fn to_float_y(self, fmin: u8, fmax: u8) -> f64 {
-        (self.as_i16() - fmin.as_i16()) as f64 / (fmax - fmin) as f64
+        f64::from(self.as_i16() - fmin.as_i16()) / f64::from(fmax - fmin)
     }
     #[inline(always)]
     fn to_float_uv(self, fmin: u8, fmax: u8) -> f64 {
         if fmin == 0 {
-            (self.as_i16() - fmin.as_i16() - 128) as f64 / fmax as f64
+            f64::from(self.as_i16() - fmin.as_i16() - 128) / f64::from(fmax)
         } else {
-            (self.as_i16() - fmin.as_i16()) as f64 / (fmax - fmin) as f64 - 0.5
+            f64::from(self.as_i16() - fmin.as_i16()) / f64::from(fmax - fmin) - 0.5
         }
     }
 }
@@ -114,14 +114,14 @@ impl ToFloat for u8 {
 impl ToFloat for u16 {
     #[inline(always)]
     fn to_float_y(self, fmin: u16, fmax: u16) -> f64 {
-        (self.as_i32() - fmin.as_i32()) as f64 / (fmax - fmin) as f64
+        f64::from(self.as_i32() - fmin.as_i32()) / f64::from(fmax - fmin)
     }
     #[inline(always)]
     fn to_float_uv(self, fmin: u16, fmax: u16) -> f64 {
         if fmin == 0 {
-            (self.as_i32() - fmin.as_i32() - (fmax.as_i32()/2+1)) as f64 / fmax as f64
+            f64::from(self.as_i32() - fmin.as_i32() - (fmax.as_i32() / 2 + 1)) / f64::from(fmax)
         } else {
-            (self.as_i32() - fmin.as_i32()) as f64 / (fmax - fmin) as f64 - 0.5
+            f64::from(self.as_i32() - fmin.as_i32()) / f64::from(fmax - fmin) - 0.5
         }
     }
 }

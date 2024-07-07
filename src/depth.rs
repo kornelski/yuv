@@ -32,12 +32,12 @@ impl Depth for Depth8 {
 
 impl Depth for Depth10 {
     type Pixel = u16;
-    const MAX: u16 = (1<<10) - 1;
+    const MAX: u16 = (1 << 10) - 1;
 }
 
 impl Depth for Depth12 {
     type Pixel = u16;
-    const MAX: u16 = (1<<12) - 1;
+    const MAX: u16 = (1 << 12) - 1;
 }
 
 impl Depth for Depth16 {

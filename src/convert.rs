@@ -1,16 +1,16 @@
 //! YUV -> RGB converter. See [`RGBConvert::new`]
-use crate::Error;
-use core::marker::PhantomData;
-use crate::color::*;
+use crate::color::{Depth, MatrixCoefficients, Range};
 use crate::depth;
 use crate::range;
+use crate::Error;
 use crate::YUV;
 use rgb::ComponentMap;
 use rgb::RGB;
+use std::marker::PhantomData;
 
 /// Trait for YUV -> RGB conversion implemented by color-space-specific converters. See [`RGBConvert`]
-pub trait ToRGB<F = u8, T = u8> {
-    /// Convert YUV (YCbCr, etc.) to RGB
+pub trait ToRGB<F = u8, T = u8> where T: Copy, F: Copy {
+    /// Convert YUV (`YCbCr`, etc.) to RGB
     fn to_rgb(&self, px: YUV<F>) -> RGB<T>;
     /// Ignore UV channels, and just convert Y
     fn to_luma(&self, y: F) -> T;
@@ -143,14 +143,14 @@ pub struct IdentityScale<T = u8> {
 
 #[inline(always)]
 fn rescale16(v: u16, fmin: u16, frange: u16) -> u16 {
-    let v = (v as i32 - fmin as i32).max(0) as u32 * 65536;
-    (v / frange as u32).min(65535) as u16
+    let v = (i32::from(v) - i32::from(fmin)).max(0) as u32 * 65536;
+    (v / u32::from(frange)).min(65535) as u16
 }
 
 #[inline(always)]
 fn rescale8(v: u8, fmin: u8, frange: u8) -> u8 {
-    let v = (v as i16 - fmin as i16).max(0) as u16 * 256;
-    (v / frange as u16).min(255) as u8
+    let v = (i16::from(v) - i16::from(fmin)).max(0) as u16 * 256;
+    (v / u16::from(frange)).min(255) as u8
 }
 
 #[inline(always)]
@@ -232,8 +232,8 @@ impl<T> Matrix<T> {
         assert!(kr > 0. && kg > 0. && kb > 0.);
         Self {
             a: (2. * (1. - kr)) as f32,
-            b: (2. * (1. - kb)*kb/kg) as f32,
-            c: (2. * (1. - kr)*kr/kg) as f32,
+            b: (2. * (1. - kb) * kb / kg) as f32,
+            c: (2. * (1. - kr) * kr / kg) as f32,
             d: (2. * (1. - kb)) as f32,
             y_scale,
             uv_scale,
@@ -319,11 +319,13 @@ impl<T> ToRGB<T, u16> for Matrix<T> where T: Into<f32> {
 
 #[test]
 fn traits_all_the_way_down() {
-    let _ = |f: RGBConvert| -> Box<dyn ToRGB<u8, u8>> { match f {
-        RGBConvert::IdentityScale(c) => Box::new(c),
-        RGBConvert::Copy(c) => Box::new(c),
-        RGBConvert::Matrix(c) => Box::new(c),
-    }};
+    let _ = |f: RGBConvert| -> Box<dyn ToRGB<u8, u8>> {
+        match f {
+            RGBConvert::IdentityScale(c) => Box::new(c),
+            RGBConvert::Copy(c) => Box::new(c),
+            RGBConvert::Matrix(c) => Box::new(c),
+        }
+    };
 }
 
 #[test]
