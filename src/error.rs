@@ -1,8 +1,8 @@
 use core::fmt;
 
-#[cfg(not(feature = "no_std"))]
+#[cfg(not(any(not(feature = "std"), feature = "no_std")))]
 use std::error;
-#[cfg(feature = "no_std")]
+#[cfg(any(not(feature = "std"), feature = "no_std"))]
 use core::error;
 
 /// This library doesn't support all combinations of color spaces

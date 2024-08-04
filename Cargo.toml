@@ -18,4 +18,8 @@ rgb = "0.8.41"
 
 
 [features]
+default = ["std"]
+# deprecated, disable std instead
 no_std = []
+# disable for no_std support. Requires 1.81
+std = []

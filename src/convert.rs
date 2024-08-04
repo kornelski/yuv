@@ -318,6 +318,7 @@ impl<T: Copy> ToRGB<T, u16> for Matrix<T> where T: Into<f32> {
 }
 
 #[test]
+#[cfg(not(any(not(feature = "std"), feature = "no_std")))]
 fn traits_all_the_way_down() {
     let _ = |f: RGBConvert| -> Box<dyn ToRGB<u8, u8>> {
         match f {
