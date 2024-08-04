@@ -2,17 +2,14 @@ use num_traits::PrimInt;
 
 pub trait Bounded {
     const MIN: Self;
-    const MAX: Self;
 }
 
 impl Bounded for u8 {
     const MIN: u8 = 0;
-    const MAX: u8 = 255;
 }
 
 impl Bounded for u16 {
     const MIN: u16 = 0;
-    const MAX: u16 = 65535;
 }
 
 pub trait Depth: 'static {

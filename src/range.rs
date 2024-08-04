@@ -1,5 +1,4 @@
 use crate::depth::{Bounded, Depth, Depth10, Depth12, Depth16, Depth8};
-use crate::ops::CheckedAs;
 use num_traits::PrimInt;
 
 pub(crate) trait Range: 'static {
@@ -89,50 +88,4 @@ pub(crate) fn to_floats<F: Range>(multiply: f64) -> (RangeScale, RangeScale) whe
         })) as f32,
     };
     (y, uv)
-}
-
-pub(crate) trait ToFloat {
-    fn to_float_y(self, fmin: Self, fmax: Self) -> f64;
-    fn to_float_uv(self, fmin: Self, fmax: Self) -> f64;
-}
-
-impl ToFloat for u8 {
-    #[inline(always)]
-    fn to_float_y(self, fmin: u8, fmax: u8) -> f64 {
-        f64::from(self.as_i16() - fmin.as_i16()) / f64::from(fmax - fmin)
-    }
-    #[inline(always)]
-    fn to_float_uv(self, fmin: u8, fmax: u8) -> f64 {
-        if fmin == 0 {
-            f64::from(self.as_i16() - fmin.as_i16() - 128) / f64::from(fmax)
-        } else {
-            f64::from(self.as_i16() - fmin.as_i16()) / f64::from(fmax - fmin) - 0.5
-        }
-    }
-}
-
-impl ToFloat for u16 {
-    #[inline(always)]
-    fn to_float_y(self, fmin: u16, fmax: u16) -> f64 {
-        f64::from(self.as_i32() - fmin.as_i32()) / f64::from(fmax - fmin)
-    }
-    #[inline(always)]
-    fn to_float_uv(self, fmin: u16, fmax: u16) -> f64 {
-        if fmin == 0 {
-            f64::from(self.as_i32() - fmin.as_i32() - (fmax.as_i32() / 2 + 1)) / f64::from(fmax)
-        } else {
-            f64::from(self.as_i32() - fmin.as_i32()) / f64::from(fmax - fmin) - 0.5
-        }
-    }
-}
-
-#[test]
-fn to_uv_zero() {
-    assert_eq!(0., 128u8.to_float_uv(0,255));
-    assert_eq!(0., 128u8.to_float_uv(16,240));
-    assert_eq!(0., (1u16<<15).to_float_uv(0,65535));
-    assert_eq!(0., 512u16.to_float_uv(64,960));
-    assert_eq!(0., 512u16.to_float_uv(Limited::<Depth10>::UV_MIN,Limited::<Depth10>::UV_MAX));
-    assert_eq!(0., 2048u16.to_float_uv(Limited::<Depth12>::UV_MIN,Limited::<Depth12>::UV_MAX));
-    assert_eq!(0., (128*256+128).to_float_uv(Limited::<Depth16>::UV_MIN,Limited::<Depth16>::UV_MAX));
 }

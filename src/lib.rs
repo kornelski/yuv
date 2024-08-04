@@ -17,7 +17,6 @@ pub use error::Error;
 
 /// These are internal
 mod depth;
-mod ops;
 mod range;
 
 /// A generic 3-component pixel, which is usually luma + chroma
