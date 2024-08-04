@@ -1,6 +1,6 @@
 [package]
 name = "yuv"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["Kornel Lesiński <kornel@geekhood.net>"]
 categories = ["multimedia::encoding"]
 description = "Conversion between various YUV (YCbCr) formats and RGB"
@@ -13,9 +13,8 @@ readme = "README.md"
 repository = "https://github.com/kornelski/yuv.git"
 
 [dependencies]
-num-traits = "0.2.14"
-rgb = "0.8.41"
-
+num-traits = "0.2.19"
+rgb = { version = "0.8.47", default-features = false }
 
 [features]
 default = ["std"]

@@ -32,7 +32,7 @@ pub struct YUV<T> {
 }
 
 /// An RGB pixel (from the [`rgb`] crate)
-pub use rgb::RGB;
+pub use rgb::Rgb as RGB;
 /// An RGBA pixel (from the [`rgb`] crate)
 #[doc(hidden)]
-pub use rgb::RGBA;
+pub use rgb::Rgba as RGBA;

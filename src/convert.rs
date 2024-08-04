@@ -4,14 +4,14 @@ use crate::depth;
 use crate::range;
 use crate::Error;
 use crate::YUV;
-use rgb::ComponentMap;
-use rgb::RGB;
-use std::marker::PhantomData;
+use rgb::Rgb;
+use rgb::prelude::*;
+use core::marker::PhantomData;
 
 /// Trait for YUV -> RGB conversion implemented by color-space-specific converters. See [`RGBConvert`]
 pub trait ToRGB<F = u8, T = u8> where T: Copy, F: Copy {
     /// Convert YUV (`YCbCr`, etc.) to RGB
-    fn to_rgb(&self, px: YUV<F>) -> RGB<T>;
+    fn to_rgb(&self, px: YUV<F>) -> Rgb<T>;
     /// Ignore UV channels, and just convert Y
     fn to_luma(&self, y: F) -> T;
 }
@@ -82,7 +82,7 @@ impl<T: Copy> RGBConvert<T> where Matrix<T>: ToRGB<T, T>, IdentityScale<T>: ToRG
     /// This method has a `match` internally, which may or may not be the fastest way to do this (dependin on optimizer).
     /// If you want to have optimal code, use variants of this `enum` individually. They all implement `ToRGB` trait.
     #[inline(always)]
-    pub fn to_rgb(&self, px: YUV<T>) -> RGB<T> {
+    pub fn to_rgb(&self, px: YUV<T>) -> Rgb<T> {
         match self {
             Self::Matrix(c) => c.to_rgb(px),
             Self::Copy(c) => c.to_rgb(px),
@@ -107,7 +107,7 @@ impl<T: Copy> ToRGB<T,T> for RGBConvert<T> where Matrix<T>: ToRGB<T, T>, Identit
     /// This method has a `match` internally, which may or may not be the fastest way to do this (dependin on optimizer).
     /// If you want to have optimal code, use variants of this `enum` individually. They all implement `ToRGB` trait.
     #[inline(always)]
-    fn to_rgb(&self, px: YUV<T>) -> RGB<T> {
+    fn to_rgb(&self, px: YUV<T>) -> Rgb<T> {
         RGBConvert::to_rgb(self, px)
     }
 
@@ -124,8 +124,8 @@ pub struct CopyGBR<T = u8>(PhantomData<T>);
 
 impl<T: Copy> ToRGB<T, T> for CopyGBR<T> {
     #[inline(always)]
-    fn to_rgb(&self, px: YUV<T>) -> RGB<T> {
-        RGB::new(px.v, px.y, px.u)
+    fn to_rgb(&self, px: YUV<T>) -> Rgb<T> {
+        Rgb { r: px.v, g: px.y, b: px.u }
     }
 
     #[inline(always)]
@@ -185,8 +185,8 @@ impl IdentityScale<u16> {
 
 impl ToRGB<u8, u8> for IdentityScale<u8> {
     #[inline(always)]
-    fn to_rgb(&self, px: YUV<u8>) -> RGB<u8> {
-        RGB {
+    fn to_rgb(&self, px: YUV<u8>) -> Rgb<u8> {
+        Rgb {
             g: rescale8(px.y, self.min, self.range),
             b: rescale8(px.u, self.min, self.range),
             r: rescale8(px.v, self.min, self.range),
@@ -201,8 +201,8 @@ impl ToRGB<u8, u8> for IdentityScale<u8> {
 
 impl ToRGB<u16, u16> for IdentityScale<u16> {
     #[inline(always)]
-    fn to_rgb(&self, px: YUV<u16>) -> RGB<u16> {
-        RGB {
+    fn to_rgb(&self, px: YUV<u16>) -> Rgb<u16> {
+        Rgb {
             g: rescale16(px.y, self.min, self.range),
             b: rescale16(px.u, self.min, self.range),
             r: rescale16(px.v, self.min, self.range),
@@ -244,9 +244,9 @@ impl<T: Copy> Matrix<T> {
     /// Input is in its original range, NOT normalized
     /// Returns range or input `RangeScale` (roughly)
     #[inline(always)]
-    fn to_rgbf(&self, px: YUV<f32>) -> RGB<f32> {
+    fn to_rgbf(&self, px: YUV<f32>) -> Rgb<f32> {
         let y = px.y * self.y_scale.mul - self.y_scale.sub;
-        RGB {
+        Rgb {
             r: (0_f32).max(y +  px.v * (self.uv_scale.mul * self.a) - (self.uv_scale.sub * self.a)),
             b: (0_f32).max(y +  px.u * (self.uv_scale.mul * self.d) - (self.uv_scale.sub * self.d)),
             g: (0_f32).max(y - (px.u * (self.uv_scale.mul * self.b) - (self.uv_scale.sub * self.b))
@@ -268,7 +268,7 @@ impl Matrix<u8> {
 
 impl<T: Copy> ToRGB<T, u8> for Matrix<T> where T: Into<f32> {
     #[inline]
-    fn to_rgb(&self, px: YUV<T>) -> RGB<u8> {
+    fn to_rgb(&self, px: YUV<T>) -> Rgb<u8> {
         self.to_rgbf(YUV {
             y: px.y.into(),
             u: px.u.into(),
@@ -302,7 +302,7 @@ impl Matrix<u16> {
 
 impl<T: Copy> ToRGB<T, u16> for Matrix<T> where T: Into<f32> {
     #[inline]
-    fn to_rgb(&self, px: YUV<T>) -> RGB<u16> {
+    fn to_rgb(&self, px: YUV<T>) -> Rgb<u16> {
         self.to_rgbf(YUV {
             y: px.y.into(),
             u: px.u.into(),
@@ -333,17 +333,17 @@ fn traits_all_the_way_down() {
 fn matrix_conv() {
     let m = Matrix::<u8>::new(0.2126, 0.0722, Range::Full);
     let px = m.to_rgbf(YUV{y:222.,u:128.,v:128.}).map(|c| c.floor() as u8);
-    assert_eq!(RGB::new(222,222,222), px);
+    assert_eq!(Rgb::new(222,222,222), px);
     assert_eq!(222u8, m.to_luma(222u8));
     assert_eq!(0u8, m.to_luma(0u8));
     assert_eq!(255u8, m.to_luma(255u8));
 
     let px = m.to_rgbf(YUV{y:128.,u:40.,v:160.}).map(|c| c.floor() as u8);
-    assert_eq!(RGB::new(179,130,0), px);
+    assert_eq!(Rgb::new(179,130,0), px);
 
     let m = Matrix::<u8>::new(0.2126, 0.0722, Range::Limited);
     let px = m.to_rgbf(YUV{y:128.,u:115.,v:90.}).map(|c| c.floor() as u8);
-    assert_eq!(RGB::new((16007u16/256) as u8, (39433u16/256) as u8, (26458u16/256) as u8), px);
+    assert_eq!(Rgb::new((16007u16/256) as u8, (39433u16/256) as u8, (26458u16/256) as u8), px);
     assert_eq!(0u8, m.to_luma(16u8));
     assert_eq!(2u8, m.to_luma(18u8));
     assert_eq!(0u8, m.to_luma(0u8));
@@ -352,11 +352,11 @@ fn matrix_conv() {
 
     let m = Matrix::<u16>::new(0.2126, 0.0722, Range::Limited, Depth::Depth10);
     let px = m.to_rgbf(YUV{y:4.*128.,u:4.*115.,v:4.*90.}).map(|c| c.floor() as u16);
-    assert_eq!(RGB::new(16007, 39433, 26458), px);
+    assert_eq!(Rgb::new(16007, 39433, 26458), px);
 
     let m = Matrix::<u16>::new(0.2126, 0.0722, Range::Limited, Depth::Depth12);
     let px = m.to_rgbf(YUV{y:16.*128.,u:16.*115.,v:16.*90.}).map(|c| c.floor() as u16);
-    assert_eq!(RGB::new(16007, 39433, 26458), px);
+    assert_eq!(Rgb::new(16007, 39433, 26458), px);
     assert_eq!(0u16, m.to_luma(0u16));
     assert_eq!(5592u16, m.to_luma(555u16));
 }
