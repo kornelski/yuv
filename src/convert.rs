@@ -40,6 +40,9 @@ fn coeffs_for_matrix(matrix_coeffs: MatrixCoefficients) -> Option<(f64, f64)> {
         MatrixCoefficients::BT601 => (0.299, 0.114),
         MatrixCoefficients::SMPTE240 => (0.212, 0.087),
         MatrixCoefficients::YCgCo => (0.25, 0.25),
+        MatrixCoefficients::BT2020NCL => (0.2627, 0.0593),
+        // although it has the same matrix as NCL, it needs postprocessing we don't do yet
+        MatrixCoefficients::BT2020CL => return None,
         _ => return None,
     })
 }
