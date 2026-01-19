@@ -36,3 +36,6 @@ pub use rgb::Rgb as RGB;
 /// An RGBA pixel (from the [`rgb`] crate)
 #[doc(hidden)]
 pub use rgb::Rgba as RGBA;
+
+/// Re-export of rgb prelude for trait access (e.g., `.map()` method on pixels)
+pub use rgb::prelude;
