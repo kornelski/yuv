@@ -57,8 +57,10 @@ pub enum TransferCharacteristics {
     /// BT.709
     BT709 = 1,
     /// BT.470 System M (historical)
+    #[deprecated(note = "This is obsolete and useless")]
     BT470M = 4,
     /// BT.470 System B, G (historical)
+    #[deprecated(note = "This is obsolete and useless")]
     BT470BG,
     /// BT.601-7 525 (SMPTE 170 M)
     BT601,
@@ -73,6 +75,7 @@ pub enum TransferCharacteristics {
     /// IEC 61966-2-4
     IEC61966,
     /// BT.1361 extended color gamut system (historical)
+    #[deprecated(note = "This is obsolete and useless")]
     BT1361,
     /// sRGB or sYCC
     SRGB,
