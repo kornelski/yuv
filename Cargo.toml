@@ -1,24 +1,25 @@
 [package]
 name = "yuv"
-version = "0.1.9"
+version = "0.1.10"
 authors = ["Kornel Lesiński <kornel@geekhood.net>"]
 categories = ["multimedia::encoding"]
-description = "Conversion between various YUV (YCbCr) formats and RGB"
-edition = "2021"
+description = "Basic conversion between various YUV (YCbCr) formats and RGB"
+edition = "2024"
 homepage = "https://lib.rs/crates/yuv"
 include = ["/Cargo.toml", "/README.md", "/src/*.rs", "LICENSE"]
 keywords = ["ycbcr", "rec709", "bt601", "color", "rgb"]
 license = "BSD-2-Clause"
 readme = "README.md"
 repository = "https://github.com/kornelski/yuv.git"
+rust-version = "1.85"
 
 [dependencies]
 num-traits = "0.2.19"
-rgb = { version = "0.8.50", default-features = false }
+rgb = { version = "0.8.52", default-features = false }
 
 [features]
 default = ["std"]
 # deprecated, disable std instead
 no_std = []
-# disable for no_std support. Requires 1.81
+# disable for no_std support
 std = []

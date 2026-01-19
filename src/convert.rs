@@ -111,13 +111,13 @@ impl<T: Copy> ToRGB<T,T> for RGBConvert<T> where Matrix<T>: ToRGB<T, T>, Identit
     /// If you want to have optimal code, use variants of this `enum` individually. They all implement `ToRGB` trait.
     #[inline(always)]
     fn to_rgb(&self, px: YUV<T>) -> Rgb<T> {
-        RGBConvert::to_rgb(self, px)
+        Self::to_rgb(self, px)
     }
 
     /// Convert a single Y (Luma) value to a grayscale value.
     #[inline(always)]
     fn to_luma(&self, y: T) -> T {
-        RGBConvert::to_luma(self, y)
+        Self::to_luma(self, y)
     }
 }
 
@@ -288,7 +288,7 @@ impl<T: Copy> ToRGB<T, u8> for Matrix<T> where T: Into<f32> {
 
 impl Matrix<u16> {
     #[inline]
-    fn new(kr: f64, kb: f64, yuv_range: Range, depth: Depth) -> Matrix<u16> {
+    fn new(kr: f64, kb: f64, yuv_range: Range, depth: Depth) -> Self {
         let (y_scale, uv_scale) = match (yuv_range, depth) {
             (Range::Full, Depth::Depth8) => range::to_floats::<range::Full<depth::Depth8>>(65535.999),
             (Range::Full, Depth::Depth10) => range::to_floats::<range::Full<depth::Depth10>>(65535.999),

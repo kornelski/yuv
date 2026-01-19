@@ -4,7 +4,6 @@
 //! 2. Routines to [`convert`] between YUV family of color spaces and RGB.
 
 #![cfg_attr(any(not(feature = "std"), feature = "no_std"), no_std)]
-#![cfg_attr(all(feature = "std", feature = "no_std"), feature(error_in_core))] // back compat hack
 
 /// Enums describing color characteristics (color space, gamma, range)
 ///
